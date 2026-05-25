@@ -1,0 +1,53 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人主页 | 项目作品</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:"Microsoft YaHei",sans-serif;}
+        body{background:linear-gradient(120deg,#e0f0ff,#f8f2ff);min-height:100vh;color:#333;}
+        nav{background:rgba(44,62,80,0.95);padding:1.2rem;box-shadow:0 3px 12px rgba(0,0,0,0.15);position:sticky;top:0;z-index:99;}
+        .nav-wrap{max-width:1100px;margin:0 auto;display:flex;gap:2.5rem;flex-wrap:wrap;align-items:center;}
+        .logo{color:#fff;font-size:20px;font-weight:bold;margin-right:2rem;}
+        nav a{color:#ddd;text-decoration:none;font-size:16px;padding:6px 12px;border-radius:6px;transition:all 0.3s ease;}
+        nav a.active{background:#3498db;color:#fff;}
+        nav a:hover{background:#34495e;color:#fff;}
+        .container{max-width:1100px;margin:4rem auto;padding:0 1.5rem;}
+        h1{color:#2c3e50;font-size:28px;margin-bottom:2rem;border-left:5px solid #3498db;padding-left:15px;}
+        .project-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:2rem;}
+        .proj-card{background:#fff;border-radius:14px;box-shadow:0 4px 18px rgba(0,0,0,0.07);padding:2rem;transition:all 0.3s;}
+        .proj-card:hover{transform:translateY(-8px);box-shadow:0 8px 28px rgba(0,0,0,0.12);}
+        .proj-card h3{color:#2980b9;margin-bottom:1rem;font-size:19px;}
+        .proj-card p{color:#666;line-height:1.7;font-size:15px;}
+    </style>
+</head>
+<body>
+<nav>
+    <div class="nav-wrap">
+        <div class="logo">个人主页</div>
+        <a href="index.html">首页</a>
+        <a href="about.html">关于我</a>
+        <a href="projects.html" class="active">项目作品</a>
+        <a href="contact.html">联系方式</a>
+    </div>
+</nav>
+<div class="container">
+    <h1>我的创作项目</h1>
+    <div class="project-grid">
+        <div class="proj-card">
+            <h3>个人静态主页</h3>
+            <p>多页面结构网站，CSS样式美化，适配电脑手机端，具备完整导航跳转功能</p>
+        </div>
+        <div class="proj-card">
+            <h3>实用网页小工具</h3>
+            <p>简易计算器、文本处理工具等原生前端小应用，轻量化无插件依赖</p>
+        </div>
+        <div class="proj-card">
+            <h3>代码学习仓库</h3>
+            <p>日常练习代码、功能Demo汇总，不断迭代优化代码写法与逻辑</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>
