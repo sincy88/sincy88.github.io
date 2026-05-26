@@ -1,0 +1,221 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>优质域名交易平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            background-color: #0f172a;
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+        /* 导航栏 */
+        header {
+            position: sticky;
+            top: 0;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+            z-index: 999;
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #38bdf8;
+            letter-spacing: 1px;
+        }
+        .nav-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            margin-left: 2rem;
+            font-size: 16px;
+            padding: 0.5rem 0;
+            position: relative;
+            transition: color 0.3s;
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 0;
+            height: 2px;
+            background: #38bdf8;
+            transition: width 0.3s ease;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            color: #38bdf8;
+        }
+        .nav-links a:hover::after, .nav-links a.active::after {
+            width: 100%;
+        }
+        /* 头部横幅 */
+        .banner {
+            height: 70vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            padding: 2rem;
+            animation: fadeIn 1.2s ease-out;
+        }
+        .banner h1 {
+            font-size: 48px;
+            margin-bottom: 1rem;
+            color: #ffffff;
+        }
+        .banner p {
+            font-size: 18px;
+            color: #94a3b8;
+            max-width: 700px;
+            margin-bottom: 2.5rem;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 36px;
+            background: #38bdf8;
+            color: #0f172a;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+        }
+        .btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(56, 189, 248, 0.4);
+        }
+        /* 域名列表区域 */
+        .domain-section {
+            max-width: 1200px;
+            margin: 6rem auto;
+            padding: 0 2rem;
+        }
+        .section-title {
+            text-align: center;
+            font-size: 32px;
+            margin-bottom: 4rem;
+            color: #ffffff;
+            position: relative;
+        }
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 3px;
+            background: #38bdf8;
+            margin: 12px auto 0;
+        }
+        .domain-card {
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 2.5rem;
+            text-align: center;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.2);
+            transition: all 0.4s ease;
+            border: 1px solid #334155;
+        }
+        .domain-card:hover {
+            transform: translateY(-8px);
+            border-color: #38bdf8;
+            box-shadow: 0 12px 40px rgba(56, 189, 248, 0.15);
+        }
+        .domain-name {
+            font-size: 36px;
+            font-weight: 700;
+            color: #38bdf8;
+            margin-bottom: 1.5rem;
+        }
+        .domain-desc {
+            color: #94a3b8;
+            font-size: 17px;
+            margin-bottom: 2rem;
+        }
+        /* 动画 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        /* 底部 */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #64748b;
+            border-top: 1px solid #1e293b;
+        }
+        /* 适配手机 */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .nav-links a {
+                margin: 0 0.8rem;
+            }
+            .banner h1 {
+                font-size: 32px;
+            }
+            .domain-name {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="nav-container">
+            <div class="logo">域名交易</div>
+            <div class="nav-links">
+                <a href="index.html" class="active">首页</a>
+                <a href="detail.html">域名详情</a>
+                <a href="contact.html">联系我们</a>
+            </div>
+        </div>
+    </header>
+
+    <section class="banner">
+        <h1>精品域名 诚信交易</h1>
+        <p>精选优质域名，适用于企业官网、品牌站点、项目平台，品相优质，性价比高</p>
+        <a href="detail.html" class="btn">查看在售域名</a>
+    </section>
+
+    <section class="domain-section">
+        <h2 class="section-title">在售精品域名</h2>
+        <div class="domain-card">
+            <div class="domain-name">hexun.com.cn</div>
+            <p class="domain-desc">简短易记、寓意优质，适合品牌搭建、商业网站、个人门户使用</p>
+            <a href="detail.html" class="btn">了解详情</a>
+        </div>
+    </section>
+
+    <footer>
+        <p>专业域名交易 | 诚信为本 合作共赢</p>
+    </footer>
+</body>
+</html>
