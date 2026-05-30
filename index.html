@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -72,18 +72,22 @@
             color: #666;
             margin-top: 15px;
         }
+        .load-tip {
+            color: #ff6700;
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>宠物图片 → 动态GIF生成器</h2>
+        <div class="load-tip" id="libTip">正在加载工具库...</div>
 
         <div class="upload-box" id="uploadBox">
             <p>点击此处 上传宠物图片</p>
             <input type="file" id="fileInput" accept="image/*">
         </div>
 
-        <!-- 图片预览 -->
         <img id="preview" alt="预览图">
 
         <div>
@@ -91,12 +95,11 @@
         </div>
         <p class="tip">上传图片后点击按钮即可生成带动效的宠物动图</p>
 
-        <!-- 绘图画布 -->
         <canvas id="drawCanvas"></canvas>
     </div>
 
-    <!-- 引入GIF合成库 CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.min.js"></script>
+    <!-- 替换为稳定CDN，关闭多线程 -->
+    <script src="https://unpkg.com/gif.js@0.2.0/dist/gif.min.js"></script>
 
     <script>
         const fileInput = document.getElementById('fileInput');
@@ -105,23 +108,37 @@
         const createGifBtn = document.getElementById('createGifBtn');
         const canvas = document.getElementById('drawCanvas');
         const ctx = canvas.getContext('2d');
+        const libTip = document.getElementById('libTip');
 
         let originImg = null;
-        // 动图尺寸，统一固定
         const CANVAS_W = 300;
         const CANVAS_H = 300;
         canvas.width = CANVAS_W;
         canvas.height = CANVAS_H;
 
-        // 点击区域唤起文件选择
+        // 检测库是否加载完成
+        window.addEventListener('load', () => {
+            if (typeof GIF !== 'undefined') {
+                libTip.innerText = "工具库加载完成，请上传图片";
+                libTip.style.color = "#27ae60";
+            } else {
+                libTip.innerText = "工具库加载失败，请刷新页面重试";
+            }
+        });
+
         uploadBox.addEventListener('click', () => {
             fileInput.click();
         });
 
-        // 监听图片上传
         fileInput.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
+
+            // 限制图片大小，避免过大卡死
+            if (file.size > 2 * 1024 * 1024) {
+                alert("图片请小于2MB，否则容易生成失败");
+                return;
+            }
 
             const reader = new FileReader();
             reader.onload = function(event) {
@@ -130,7 +147,6 @@
 
                 img.onload = function() {
                     originImg = img;
-                    // 显示预览
                     preview.src = img.src;
                     preview.style.display = 'block';
                     createGifBtn.disabled = false;
@@ -139,75 +155,77 @@
             reader.readAsDataURL(file);
         });
 
-        // 生成GIF：图片小幅左右摇摆 + 轻微缩放（模拟宠物小动作）
         createGifBtn.addEventListener('click', function() {
-            if (!originImg) return;
+            if (!originImg || typeof GIF === 'undefined') {
+                alert("请先上传图片，或刷新页面");
+                return;
+            }
             createGifBtn.disabled = true;
             createGifBtn.innerText = "正在生成...";
 
+            // 关键：workers:0 禁用多线程，线上/本地通用
             const gif = new GIF({
-                workers: 2,
+                workers: 0,
                 quality: 10,
                 width: CANVAS_W,
                 height: CANVAS_H
             });
 
-            // 生成多帧动作：左右摇摆 + 微小缩放
-            const frameCount = 12;  // 总帧数
-            const swingRange = 8;    // 左右摆动幅度
-            const scaleMin = 0.96;  // 最小缩放
-            const scaleMax = 1.02;  // 最大缩放
+            // 减少帧数，降低运算压力
+            const frameCount = 8;
+            const swingRange = 6;
+            const scaleMin = 0.97;
+            const scaleMax = 1.01;
 
-            for (let i = 0; i < frameCount; i++) {
-                ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
-                const progress = i / frameCount;
+            try {
+                for (let i = 0; i < frameCount; i++) {
+                    ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+                    const progress = i / frameCount;
 
-                // 计算偏移与缩放
-                const offsetX = Math.sin(progress * Math.PI * 2) * swingRange;
-                const scale = scaleMin + Math.sin(progress * Math.PI * 2) * (scaleMax - scaleMin);
+                    const offsetX = Math.sin(progress * Math.PI * 2) * swingRange;
+                    const scale = scaleMin + Math.sin(progress * Math.PI * 2) * (scaleMax - scaleMin);
 
-                ctx.save();
-                // 画布中心变换，实现摇摆+缩放
-                ctx.translate(CANVAS_W/2 + offsetX, CANVAS_H/2);
-                ctx.scale(scale, scale);
+                    ctx.save();
+                    ctx.translate(CANVAS_W/2 + offsetX, CANVAS_H/2);
+                    ctx.scale(scale, scale);
 
-                // 居中绘制原图
-                const imgW = originImg.width;
-                const imgH = originImg.height;
-                // 等比例缩放到画布内
-                let drawW = CANVAS_W - 20;
-                let drawH = CANVAS_H - 20;
-                let ratio = Math.min(drawW / imgW, drawH / imgH);
-                drawW = imgW * ratio;
-                drawH = imgH * ratio;
+                    const imgW = originImg.width;
+                    const imgH = originImg.height;
+                    let drawW = CANVAS_W - 20;
+                    let drawH = CANVAS_H - 20;
+                    let ratio = Math.min(drawW / imgW, drawH / imgH);
+                    drawW = imgW * ratio;
+                    drawH = imgH * ratio;
 
-                ctx.drawImage(
-                    originImg,
-                    -drawW / 2,
-                    -drawH / 2,
-                    drawW,
-                    drawH
-                );
-                ctx.restore();
+                    ctx.drawImage(originImg, -drawW / 2, -drawH / 2, drawW, drawH);
+                    ctx.restore();
 
-                // 添加一帧，每帧间隔 100ms
-                gif.addFrame(canvas, { delay: 100, copy: true });
-            }
+                    gif.addFrame(canvas, { delay: 120, copy: true });
+                }
 
-            // 生成完成，触发下载
-            gif.on('finished', function(blob) {
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob);
-                a.download = '宠物动态图.gif';
-                a.click();
+                gif.on('finished', function(blob) {
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = '宠物动态图.gif';
+                    a.click();
 
+                    createGifBtn.disabled = false;
+                    createGifBtn.innerText = "生成动态GIF并下载";
+                });
+
+                // 超时兜底，防止永久卡住
+                setTimeout(() => {
+                    createGifBtn.disabled = false;
+                    createGifBtn.innerText = "生成动态GIF并下载";
+                }, 15000);
+
+                gif.render();
+            } catch (err) {
+                alert("生成出错：" + err.message);
                 createGifBtn.disabled = false;
                 createGifBtn.innerText = "生成动态GIF并下载";
-            });
-
-            gif.render();
+            }
         });
     </script>
 </body>
 </html>
-</script>
