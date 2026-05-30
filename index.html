@@ -13,6 +13,26 @@
         .upload-box:hover {border-color: #409eff;background: #f8fbff;}
         input[type="file"] {display: none;}
         #preview {max-width: 250px;max-height: 250px;margin: 15px auto;display: none;border-radius: 8px;}
+        /* GIF预览区样式 */
+        .gif-preview-wrap {
+            margin: 20px auto;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            min-height: 320px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #gifPreview {
+            max-width: 300px;
+            max-height: 300px;
+            display: none;
+        }
+        .tip-empty {
+            color: #999;
+            font-size: 14px;
+        }
         canvas {display: none;}
         .btn {padding: 10px 24px;font-size: 16px;border: none;border-radius: 6px;background: #409eff;color: #fff;cursor: pointer;margin: 8px;}
         .btn:disabled {background: #ccc;cursor: not-allowed;}
@@ -26,11 +46,19 @@
             <p>点击上传宠物图片</p>
             <input type="file" id="fileInput" accept="image/*">
         </div>
-        <img id="preview" alt="预览">
+        <img id="preview" alt="原图预览">
+
+        <!-- GIF 预览区域 -->
+        <div class="gif-preview-wrap">
+            <span class="tip-empty" id="emptyTip">生成的动图将在此处预览</span>
+            <img id="gifPreview" alt="动图预览">
+        </div>
+
         <div>
             <button class="btn" id="makeGifBtn" disabled>生成并下载 GIF</button>
         </div>
-        <p class="tip">自动生成摇摆动图，直接下载 GIF 文件</p>
+        <p class="tip">自动生成摇摆动图，预览后可直接下载</p>
+
         <canvas id="mainCanvas"></canvas>
     </div>
 
@@ -41,6 +69,9 @@ const preview = document.getElementById('preview');
 const makeGifBtn = document.getElementById('makeGifBtn');
 const canvas = document.getElementById('mainCanvas');
 const ctx = canvas.getContext('2d');
+// 新增预览元素
+const gifPreview = document.getElementById('gifPreview');
+const emptyTip = document.getElementById('emptyTip');
 
 const W = 300, H = 300;
 canvas.width = W;
@@ -61,12 +92,15 @@ fileInput.onchange = e => {
             preview.src = img.src;
             preview.style.display = 'block';
             makeGifBtn.disabled = false;
+            // 重置预览区
+            gifPreview.style.display = 'none';
+            emptyTip.style.display = 'inline';
         }
     };
     reader.readAsDataURL(file);
 };
 
-// 简易纯JS GIF编码器（内置，无外部依赖）
+// 简易纯JS GIF编码器
 class SimpleGif {
     constructor(w, h, delay=120) {
         this.w = w;
@@ -82,13 +116,10 @@ class SimpleGif {
         const w = this.w, h = this.h;
         const delay = this.delay;
         let out = [];
-        // GIF 头部
         out.push(...[71,73,70,56,57,97]);
         out.push(w&0xff, w>>8&0xff, h&0xff, h>>8&0xff);
         out.push(0xf7, 0, 0);
-        // 全局色表占位
         for(let i=0;i<768;i++) out.push(0xff);
-        // 循环标记
         out.push(0x21,0xff,0x0b);
         out.push(...[78,69,84,83,67,65,80,69,50,46,48,0,1,0,0,0]);
 
@@ -109,7 +140,7 @@ class SimpleGif {
     }
 }
 
-// 生成并下载 GIF
+// 生成、预览 + 下载 GIF
 makeGifBtn.onclick = async function(){
     if(!srcImg) return;
     this.disabled = true;
@@ -140,10 +171,19 @@ makeGifBtn.onclick = async function(){
         await new Promise(r=>setTimeout(r,20));
     }
 
+    // 组装GIF二进制
     const bin = gif.build();
     const blob = new Blob([bin], {type: 'image/gif'});
+    const blobUrl = URL.createObjectURL(blob);
+
+    // 展示到预览区
+    emptyTip.style.display = 'none';
+    gifPreview.src = blobUrl;
+    gifPreview.style.display = 'block';
+
+    // 触发下载
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
+    a.href = blobUrl;
     a.download = '宠物动图.gif';
     a.click();
 
