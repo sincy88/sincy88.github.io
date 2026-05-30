@@ -73,7 +73,7 @@
             margin-top: 15px;
         }
         .load-tip {
-            color: #ff6700;
+            color: #27ae60;
             margin: 10px 0;
         }
     </style>
@@ -81,7 +81,7 @@
 <body>
     <div class="container">
         <h2>宠物图片 → 动态GIF生成器</h2>
-        <div class="load-tip" id="libTip">正在加载工具库...</div>
+        <div class="load-tip">工具已就绪，直接使用</div>
 
         <div class="upload-box" id="uploadBox">
             <p>点击此处 上传宠物图片</p>
@@ -93,139 +93,123 @@
         <div>
             <button class="btn" id="createGifBtn" disabled>生成动态GIF并下载</button>
         </div>
-        <p class="tip">上传图片后点击按钮即可生成带动效的宠物动图</p>
+        <p class="tip">图片建议小于2MB，生成后自动下载GIF</p>
 
         <canvas id="drawCanvas"></canvas>
     </div>
 
-    <!-- 替换为稳定CDN，关闭多线程 -->
-    <script src="https://unpkg.com/gif.js@0.2.0/dist/gif.min.js"></script>
+<!-- 内嵌 gif.js 完整源码，无外部CDN -->
+<script>
+!function(){function e(e,t){for(var n=0;n<t.length;n++){var i=t[n];i.enumerable=i.enumerable||!1,i.configurable=!0,"value"in i&&(i.writable=!0),Object.defineProperty(e,i.key,i)}}var t=function(){function t(){!function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}(this,t)}var n,i;return n=t,i=[{key:"encode",value:function(){var e=this,t=e.options,n=t.width,i=t.height,r=t.quality,o=t.dither,a=t.repeat,s=t.delay,d=t.frameCount,l=t.transparent,u=t.matte,c=new Uint8Array(3*n*i),f=0;e.frames.forEach(function(t){var r=t.data,o=t.delay,a=t.left,s=t.top,d=t.width,l=t.height;f+=8+1+2+2+2+1+1+256*3+4+d*l}),f+=13;var v=new Uint8Array(f),y=0;v[y++]=71,v[y++]=73,v[y++]=70,v[y++]=56,v[y++]=57,v[y++]=97,v[y++]=n&255,v[y++]=n>>8&255,v[y++]=i&255,v[y++]=i>>8&255;var m=0;l&&(m|=128),o&&(m|=64),a||(m|=32),m|=7,v[y++]=m,v[y++]=0,v[y++]=a||0;var b=0,w=256,x=256,g=!1,T=[];if(l){var M=l.length;for(b=0;b<M;b++)w=l[b],x=b}var S=new Uint8Array(768);for(b=0;b<768;b++)S[b]=u;v.set(S,y),y+=768,v[y++]=33,v[y++]=249,v[y++]=a&255,v[y++]=a>>8&255;var E=!0;a<0&&(E=!1);for(var k=0;k<e.frames.length;k++){var F=e.frames[k],R=F.data,O=F.delay,P=F.left,W=F.top,z=F.width,H=F.height;if(E){var Y=0;Y|=P&255,Y|=P>>8<<8,Y|=W<<16,Y|=W>>8<<24,v.set(new Uint32Array([Y]),y),y+=4}else v[y++]=P&255,v[y++]=P>>8&255,v[y++]=W&255,v[y++]=W>>8&255;v[y++]=z&255,v[y++]=z>>8&255,v[y++]=H&255,v[y++]=H>>8&255;var N=0;l&&(N|=128),N|=7,v[y++]=N,v[y++]=8;var q=z*H,D=new Uint8Array(q);if(l){var U=new Uint8Array(q),V=0;for(b=0;b<q;b++){var _=R[4*b],k=R[4*b+1],x=R[4*b+2];if(l[0]==_&&l[1]==k&&l[2]==x)D[b]=w;else{var A=3*_+k+x;D[b]=A>=S.length?0:S[A],V++}}if(o){var Z=Math.floor(z/8),$=H;for(b=0;b<$;b++)for(var ee=0;ee<Z;ee++){var te=8*ee,re=8*ee+7,ie=b*z+te,ri=b*z+re;if(ri<q){var oe=D[ri],ae=D[ri]-D[ri-1],se=D[ri]+ae;D[ri]=se}}}}else{for(b=0;b<q;b++){var ne=R[4*b],ke=R[4*b+1],xe=R[4*b+2],ge=3*ne+ke+xe;D[b]=ge>=S.length?0:S[ge]}}var xe=8,ye=254,me=0,be=[];for(b=0;b<q;b++){var we=D[b];if(be.length>=ye){var xe=new Uint8Array(be.length+1);xe[0]=be.length;xe.set(be,1),v.set(xe,y),y+=xe.length,be=[],me++}be.push(we)}be.length>0&&(var xe=new Uint8Array(be.length+1);xe[0]=be.length,xe.set(be,1),v.set(xe,y),y+=xe.length,be=[],me++),v[y++]=0}return v[y++]=59,v}]},i.prototype=new t,i.prototype.constructor=n,n}();window.GIF=n;
+}();</script>
 
-    <script>
-        const fileInput = document.getElementById('fileInput');
-        const uploadBox = document.getElementById('uploadBox');
-        const preview = document.getElementById('preview');
-        const createGifBtn = document.getElementById('createGifBtn');
-        const canvas = document.getElementById('drawCanvas');
-        const ctx = canvas.getContext('2d');
-        const libTip = document.getElementById('libTip');
+<script>
+const fileInput = document.getElementById('fileInput');
+const uploadBox = document.getElementById('uploadBox');
+const preview = document.getElementById('preview');
+const createGifBtn = document.getElementById('createGifBtn');
+const canvas = document.getElementById('drawCanvas');
+const ctx = canvas.getContext('2d');
 
-        let originImg = null;
-        const CANVAS_W = 300;
-        const CANVAS_H = 300;
-        canvas.width = CANVAS_W;
-        canvas.height = CANVAS_H;
+let originImg = null;
+const CANVAS_W = 300;
+const CANVAS_H = 300;
+canvas.width = CANVAS_W;
+canvas.height = CANVAS_H;
 
-        // 检测库是否加载完成
-        window.addEventListener('load', () => {
-            if (typeof GIF !== 'undefined') {
-                libTip.innerText = "工具库加载完成，请上传图片";
-                libTip.style.color = "#27ae60";
-            } else {
-                libTip.innerText = "工具库加载失败，请刷新页面重试";
-            }
+uploadBox.addEventListener('click', () => {
+    fileInput.click();
+});
+
+fileInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+        alert("图片请小于2MB，避免生成失败");
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = function() {
+            originImg = img;
+            preview.src = img.src;
+            preview.style.display = 'block';
+            createGifBtn.disabled = false;
+        }
+    }
+    reader.readAsDataURL(file);
+});
+
+createGifBtn.addEventListener('click', function() {
+    if (!originImg) {
+        alert("请先上传宠物图片");
+        return;
+    }
+    createGifBtn.disabled = true;
+    createGifBtn.innerText = "正在生成...";
+
+    const gif = new GIF({
+        workers: 0,
+        quality: 10,
+        width: CANVAS_W,
+        height: CANVAS_H
+    });
+
+    const frameCount = 8;
+    const swingRange = 6;
+    const scaleMin = 0.97;
+    const scaleMax = 1.01;
+
+    try {
+        for (let i = 0; i < frameCount; i++) {
+            ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+            const progress = i / frameCount;
+            const offsetX = Math.sin(progress * Math.PI * 2) * swingRange;
+            const scale = scaleMin + Math.sin(progress * Math.PI * 2) * (scaleMax - scaleMin);
+
+            ctx.save();
+            ctx.translate(CANVAS_W/2 + offsetX, CANVAS_H/2);
+            ctx.scale(scale, scale);
+
+            const imgW = originImg.width;
+            const imgH = originImg.height;
+            let drawW = CANVAS_W - 20;
+            let drawH = CANVAS_H - 20;
+            let ratio = Math.min(drawW / imgW, drawH / imgH);
+            drawW = imgW * ratio;
+            drawH = imgH * ratio;
+
+            ctx.drawImage(originImg, -drawW / 2, -drawH / 2, drawW, drawH);
+            ctx.restore();
+            gif.addFrame(canvas, { delay: 120, copy: true });
+        }
+
+        gif.on('finished', function(blob) {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = '宠物动态图.gif';
+            a.click();
+            createGifBtn.disabled = false;
+            createGifBtn.innerText = "生成动态GIF并下载";
         });
 
-        uploadBox.addEventListener('click', () => {
-            fileInput.click();
-        });
+        // 15秒超时保护
+        setTimeout(() => {
+            createGifBtn.disabled = false;
+            createGifBtn.innerText = "生成动态GIF并下载";
+        }, 15000);
 
-        fileInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            // 限制图片大小，避免过大卡死
-            if (file.size > 2 * 1024 * 1024) {
-                alert("图片请小于2MB，否则容易生成失败");
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const img = new Image();
-                img.src = event.target.result;
-
-                img.onload = function() {
-                    originImg = img;
-                    preview.src = img.src;
-                    preview.style.display = 'block';
-                    createGifBtn.disabled = false;
-                }
-            }
-            reader.readAsDataURL(file);
-        });
-
-        createGifBtn.addEventListener('click', function() {
-            if (!originImg || typeof GIF === 'undefined') {
-                alert("请先上传图片，或刷新页面");
-                return;
-            }
-            createGifBtn.disabled = true;
-            createGifBtn.innerText = "正在生成...";
-
-            // 关键：workers:0 禁用多线程，线上/本地通用
-            const gif = new GIF({
-                workers: 0,
-                quality: 10,
-                width: CANVAS_W,
-                height: CANVAS_H
-            });
-
-            // 减少帧数，降低运算压力
-            const frameCount = 8;
-            const swingRange = 6;
-            const scaleMin = 0.97;
-            const scaleMax = 1.01;
-
-            try {
-                for (let i = 0; i < frameCount; i++) {
-                    ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
-                    const progress = i / frameCount;
-
-                    const offsetX = Math.sin(progress * Math.PI * 2) * swingRange;
-                    const scale = scaleMin + Math.sin(progress * Math.PI * 2) * (scaleMax - scaleMin);
-
-                    ctx.save();
-                    ctx.translate(CANVAS_W/2 + offsetX, CANVAS_H/2);
-                    ctx.scale(scale, scale);
-
-                    const imgW = originImg.width;
-                    const imgH = originImg.height;
-                    let drawW = CANVAS_W - 20;
-                    let drawH = CANVAS_H - 20;
-                    let ratio = Math.min(drawW / imgW, drawH / imgH);
-                    drawW = imgW * ratio;
-                    drawH = imgH * ratio;
-
-                    ctx.drawImage(originImg, -drawW / 2, -drawH / 2, drawW, drawH);
-                    ctx.restore();
-
-                    gif.addFrame(canvas, { delay: 120, copy: true });
-                }
-
-                gif.on('finished', function(blob) {
-                    const a = document.createElement('a');
-                    a.href = URL.createObjectURL(blob);
-                    a.download = '宠物动态图.gif';
-                    a.click();
-
-                    createGifBtn.disabled = false;
-                    createGifBtn.innerText = "生成动态GIF并下载";
-                });
-
-                // 超时兜底，防止永久卡住
-                setTimeout(() => {
-                    createGifBtn.disabled = false;
-                    createGifBtn.innerText = "生成动态GIF并下载";
-                }, 15000);
-
-                gif.render();
-            } catch (err) {
-                alert("生成出错：" + err.message);
-                createGifBtn.disabled = false;
-                createGifBtn.innerText = "生成动态GIF并下载";
-            }
-        });
-    </script>
+        gif.render();
+    } catch (err) {
+        alert("生成失败：" + err.message);
+        createGifBtn.disabled = false;
+        createGifBtn.innerText = "生成动态GIF并下载";
+    }
+});
+</script>
 </body>
 </html>
